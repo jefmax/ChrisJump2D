@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyJump : MonoBehaviour
 {
     public float jumpForce = 8f;    // fuerza del salto
-    public int damage = 1;          // daño al jugador
+    public int damage = 1;          // daï¿½o al jugador
 
     private Rigidbody2D rb;
 
@@ -20,7 +20,7 @@ public class EnemyJump : MonoBehaviour
             Jump();
         }
 
-        // Si toca al jugador, le causa daño
+        // Si toca al jugador, le causa daï¿½o
         if (collision.collider.CompareTag("Player"))
         {
             PlayerHealth player = collision.collider.GetComponent<PlayerHealth>();
@@ -34,7 +34,7 @@ public class EnemyJump : MonoBehaviour
     private void Jump()
     {
         // Reinicia velocidad vertical antes de aplicar fuerza
-        rb.velocity = new Vector2(rb.velocity.x, 0f);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
 }

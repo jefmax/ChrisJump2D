@@ -11,6 +11,9 @@ public class PlayerMovement : MonoBehaviour
     private int jumpCount = 0;
     public int maxJumps = 2;
 
+    // 🟢 NUEVO: referencia al FirePoint
+    public Transform firePoint;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -31,16 +34,27 @@ public class PlayerMovement : MonoBehaviour
             // Salto / Doble salto
             if (Keyboard.current.spaceKey.wasPressedThisFrame && jumpCount < maxJumps)
             {
-                rb.velocity = new Vector2(rb.velocity.x, 0f);
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
                 rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
                 jumpCount++;
 
                 anim.SetBool("isJumping", true); // ⬆️ Cambiar a animación de salto
             }
         }
+
+        // Girar el personaje
         if (horizontal != 0)
         {
-            transform.localScale = new Vector3(Mathf.Sign(horizontal), 1f, 1f);
+            float direction = Mathf.Sign(horizontal);
+            transform.localScale = new Vector3(direction, 1f, 1f);
+
+            // 🟢 NUEVO: hacer que el FirePoint también se voltee
+            if (firePoint != null)
+            {
+                firePoint.localScale = new Vector3(direction, 1f, 1f);
+
+                firePoint.localRotation = Quaternion.Euler(0, direction == 1 ? 0 : 180, 0);
+            }
         }
 
         // 🔄 Actualizar velocidad al Animator
@@ -50,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         if (Time.timeScale == 0f) return;
-        rb.velocity = new Vector2(horizontal * moveSpeed, rb.velocity.y);
+        rb.linearVelocity = new Vector2(horizontal * moveSpeed, rb.linearVelocity.y);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

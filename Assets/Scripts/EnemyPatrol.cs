@@ -17,12 +17,12 @@ public class EnemyPatrol : MonoBehaviour
     {
         // Movimiento horizontal constante
         float moveDirection = movingRight ? 1f : -1f;
-        rb.velocity = new Vector2(moveDirection * speed, rb.velocity.y);
+        rb.linearVelocity = new Vector2(moveDirection * speed, rb.linearVelocity.y);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Cada vez que choca con algo con el tag "Wall" cambia de dirección
+        // Cada vez que choca con algo con el tag "Wall" cambia de direcciï¿½n
         if (collision.gameObject.CompareTag("Wall"))
         {
             Flip();
