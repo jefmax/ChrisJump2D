@@ -17,12 +17,12 @@ public class Bullet : MonoBehaviour
         // Si PlayerShoot nos dio una velocidad inicial, úsala.
         if (initialVelocity != Vector2.zero)
         {
-            rb.velocity = initialVelocity;
+            rb.linearVelocity = initialVelocity;
         }
         else
         {
             // Comportamiento por defecto (si no se pasó una velocidad)
-            rb.velocity = transform.right * speed;
+            rb.linearVelocity = transform.right * speed;
         }
     }
 
@@ -35,10 +35,24 @@ public class Bullet : MonoBehaviour
     {
         if (collision.collider.CompareTag("Enemy"))
         {
-            Destroy(collision.collider.gameObject);
+            // ¿Es el jefe?
+            FinalBoss boss = collision.collider.GetComponent<FinalBoss>();
+
+            if (boss != null)
+            {
+                // Es el Boss -> solo recibe daño
+                boss.TakeDamage(1);
+            }
+            else
+            {
+                // Es un enemigo normal -> morir instantáneo
+                Destroy(collision.collider.gameObject);
+            }
         }
 
+        // La bala siempre desaparece
         Destroy(gameObject);
     }
+
 }
 
