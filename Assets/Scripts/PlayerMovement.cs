@@ -11,74 +11,91 @@ public class PlayerMovement : MonoBehaviour
     private int jumpCount = 0;
     public int maxJumps = 2;
 
-    // 🟢 NUEVO: referencia al FirePoint
+    // 🟢 FirePoint
     public Transform firePoint;
+
+    private MobileInput mi;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>(); // ✅ Referencia al Animator
+        anim = GetComponent<Animator>();
+
+        mi = MobileInput.instance;
     }
 
     void Update()
     {
         if (Time.timeScale == 0f) return;
 
-        // Movimiento horizontal
+        horizontal = 0; // 🔴 IMPORTANTE: limpiamos antes de leer teclas o móvil
+
+        // 🟢--------------- CONTROLES DE TECLADO ---------------
         if (Keyboard.current != null)
         {
             if (Keyboard.current.aKey.isPressed) horizontal = -1;
             else if (Keyboard.current.dKey.isPressed) horizontal = 1;
-            else horizontal = 0;
 
-            // Salto / Doble salto
             if (Keyboard.current.spaceKey.wasPressedThisFrame && jumpCount < maxJumps)
-            {
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
-                rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-                jumpCount++;
+                Jump();
+        }
 
-                anim.SetBool("isJumping", true); // ⬆️ Cambiar a animación de salto
+        // 🟢--------------- CONTROLES MÓVILES (AHORA SE LEEN DESPUÉS) ---------------
+        if (mi != null)
+        {
+            if (mi.leftPressed) horizontal = -1;
+            else if (mi.rightPressed) horizontal = 1;
+
+            if (mi.jumpPressed && jumpCount < maxJumps)
+            {
+                Jump();
+                mi.jumpPressed = false; // 🔵 Muy importante
             }
         }
 
-        // Girar el personaje
+        // 🌀 Girar el personaje
         if (horizontal != 0)
         {
             float direction = Mathf.Sign(horizontal);
             transform.localScale = new Vector3(direction, 1f, 1f);
 
-            // 🟢 NUEVO: hacer que el FirePoint también se voltee
             if (firePoint != null)
             {
                 firePoint.localScale = new Vector3(direction, 1f, 1f);
-
                 firePoint.localRotation = Quaternion.Euler(0, direction == 1 ? 0 : 180, 0);
             }
         }
 
-        // 🔄 Actualizar velocidad al Animator
+        // 🔄 Actualizar animación
         anim.SetFloat("Speed", Mathf.Abs(horizontal));
     }
 
     private void FixedUpdate()
     {
         if (Time.timeScale == 0f) return;
+
         rb.linearVelocity = new Vector2(horizontal * moveSpeed, rb.linearVelocity.y);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Detectar si colisionó con el suelo
         foreach (ContactPoint2D contact in collision.contacts)
         {
             if (contact.normal.y > 0.5f)
             {
                 jumpCount = 0;
-                anim.SetBool("isJumping", false); // ⬇️ Volver a animación normal
+                anim.SetBool("isJumping", false);
                 break;
             }
         }
+    }
+
+    void Jump()
+    {
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        jumpCount++;
+        anim.SetBool("isJumping", true);
     }
 }
 

@@ -6,8 +6,8 @@ public class PlayerShoot : MonoBehaviour
     public Transform firePoint;
     public GameObject bulletPrefab;
     public float fireRate = 0.25f;
-    private float nextFireTime = 0f;
 
+    private float nextFireTime = 0f;
     private Collider2D playerCollider;
 
     void Start()
@@ -17,33 +17,44 @@ public class PlayerShoot : MonoBehaviour
 
     void Update()
     {
-        if (Keyboard.current != null &&
-            Keyboard.current.fKey.isPressed &&
-            Time.time >= nextFireTime)
+        if (Time.time < nextFireTime)
+            return;
+
+        bool shootKeyboard = Keyboard.current != null && Keyboard.current.fKey.isPressed;
+        bool shootMobile = MobileInput.instance != null && MobileInput.instance.shootPressed;
+
+        // Disparo por teclado o móvil
+        if (shootKeyboard || shootMobile)
         {
             Shoot();
             nextFireTime = Time.time + fireRate;
+
+            // Evita disparos infinitos en móvil por dejar pulsado
+            if (shootMobile)
+                MobileInput.instance.shootPressed = false;
         }
     }
 
-    void Shoot()
+    void Shoot() 
     {
         if (bulletPrefab == null || firePoint == null)
             return;
 
-        // Crear la bala en el firePoint
+        // Instanciar bala
         GameObject bulletGO = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
 
-        // IGNORAR colisión con el jugador
+        // Ignorar colisión con el jugador
         Collider2D bulletCollider = bulletGO.GetComponent<Collider2D>();
         if (bulletCollider != null && playerCollider != null)
         {
-            Physics2D.IgnoreCollision(bulletCollider, playerCollider, true);
+            Physics2D.IgnoreCollision(bulletCollider, playerCollider);
         }
 
-        // 📌 Dirección del disparo (basado en hacia dónde mira el player)
+        // Dirección según la escala del jugador
         float direction = transform.localScale.x > 0 ? 1f : -1f;
         bulletGO.GetComponent<Bullet>().SetDirection(new Vector2(direction, 0f));
     }
 }
+
+
 
