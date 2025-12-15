@@ -36,6 +36,16 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    public void AddLife(int amount = 1)
+    {
+        currentHealth += amount;
+
+        if (currentHealth > maxHealth)
+            currentHealth = maxHealth;
+
+        Debug.Log("Vida aumentada. Vida actual: " + currentHealth);
+    }
+
     private void Die()
     {
         isDead = true;

@@ -42,9 +42,21 @@ public class CarController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        // 1. Si el jugador toca el carro y aún no se ha montado
         if (!playerInside && collision.collider.CompareTag("Player"))
         {
             EnterCar(collision.collider.gameObject);
+            return;
+        }
+
+        // 2. Si el carro toca un enemigo (jugador ya montado o no)
+        if (playerInside && collision.collider.CompareTag("Enemy"))
+        {
+            PlayerHealth ph = FindObjectOfType<PlayerHealth>();
+            if (ph != null)
+            {
+                ph.TakeDamage(1);
+            }
         }
     }
 
