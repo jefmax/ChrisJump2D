@@ -8,9 +8,18 @@ public class Coin : MonoBehaviour
     {
         if (collision.CompareTag("Player") || collision.CompareTag("Car"))
         {
-            ScoreManager.instance.AddPoint(points);
+            if (ScoreManager.instance != null)
+            {
+                ScoreManager.instance.AddPoint(points);
+            }
+            else
+            {
+                Debug.LogError("ScoreManager no existe en esta escena");
+            }
+
             Destroy(gameObject);
         }
     }
 }
+
 

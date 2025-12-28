@@ -169,4 +169,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bullet
   speed: 10
-  lifeTime: 2
+  lifeTime: 1.2
